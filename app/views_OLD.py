@@ -1,11 +1,13 @@
-from a_Model import ModelIt
-from flask import render_template
-from flask import request
-from flaskexample import app
+#!/Users/cadeadams/anaconda3/bin/python3
+from flask import Flask, render_template, flash, request, redirect, url_for
+#from flaskexample import app
 from sqlalchemy import create_engine
 from sqlalchemy_utils import database_exists, create_database
 import pandas as pd
 import psycopg2
+import os
+from fbprophet import Prophet
+import dateparser
 
 user = 'cadeadams' #add your username here (same as previous postgreSQL)                      
 host = 'localhost'
@@ -14,12 +16,18 @@ db = create_engine('postgres://%s%s/%s'%(user,host,dbname))
 con = None
 con = psycopg2.connect(database = dbname, user = user)
 
+def calc_nowish():
+    now = datetime.datetime.now() + datetime.timedelta(hours=3)
+    now = datetime.datetime(now.year, now.month, now.day, now.hour,
+                            15*round((float(now.minute) + float(now.second) / 60) // 15))
+    now = now.strftime("%m-%d-%Y %H:%M")
+    return now
+
 @app.route('/')
-@app.route('/index')
+#@app.route('/index')
 def index():
-    return render_template("index.html",
-       title = 'Home', user = { 'nickname': 'Miguel' },
-       )
+    now = calc_nowish()
+    return render_template("index.html", now = now)
 
 @app.route('/db')
 def birth_page():

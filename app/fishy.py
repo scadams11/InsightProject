@@ -19,7 +19,7 @@ app = Flask(__name__)
 ##
 user = 'cadeadams' #add your username here (same as previous postgreSQL)                      
 host = 'localhost'
-dbname = 'birth_db'
+dbname = 'usgs_stream_db'
 db = create_engine('postgres://%s%s/%s'%(user,host,dbname))
 con = None
 con = psycopg2.connect(database = dbname, user = user)
@@ -92,17 +92,17 @@ def results():
 
 
 
-#@app.route('/db')
-#def birth_page():
-#    sql_query = """                                                                       
-#                SELECT * FROM birth_data_table WHERE delivery_method='Cesarean';
-#                """
-#    query_results = pd.read_sql_query(sql_query,con)
-#    births = ""
-#    for i in range(0,10):
-#        births += query_results.iloc[i]['birth_month']
-#        births += "<br>"
-#    return births
+@app.route('/db')
+def stream_page():
+    sql_query = """                                                                       
+                SELECT * FROM n"""+site_no[i]""";
+                """
+    query_results = pd.read_sql_query(sql_query,con)
+    streams = ""
+    for i in range(0,10):
+        streams += query_results.iloc[i]['birth_month']
+        streams += "<br>"
+    return streams
 
 #@app.route('/input')
 #def cesareans_input():

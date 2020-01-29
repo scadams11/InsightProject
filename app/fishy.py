@@ -7,6 +7,7 @@ import pandas as pd
 import psycopg2
 import os
 
+import geopy.distance
 
 from fbprophet import Prophet
 import datetime, re, requests
@@ -90,38 +91,38 @@ def results():
                            time=t,
                            map_url=map_url)
 
-
-
-@app.route('/db')
-def stream_page():
-    sql_query = """                                                                       
-                SELECT * FROM n"""+site_no[i]""";
-                """
-    query_results = pd.read_sql_query(sql_query,con)
-    streams = ""
-    for i in range(0,10):
-        streams += query_results.iloc[i]['birth_month']
-        streams += "<br>"
-    return streams
+##
+#For pulling stream information based off input location.
+##
+#@app.route('/db')
+#def stream_page():
+#    sql_query = """                                                                       
+#                SELECT * FROM n"""+site_no[i]""";
+#                """
+#    query_results = pd.read_sql_query(sql_query,con)
+#    streams = ""
+#    for i in range(0,10):
+#        streams += query_results.iloc[i]['birth_month']
+#        streams += "<br>"
+#    return streams
 
 #@app.route('/input')
 #def cesareans_input():
 #    return render_template("input.html")
 
 #@app.route('/output')
-#def cesareans_output():
-#  #pull 'birth_month' from input field and store it
-#  patient = request.args.get('birth_month')
-#    #just select the Cesareans  from the birth dtabase for the month that the user inputs
-#  query = "SELECT index, attendant, birth_month FROM birth_data_table WHERE delivery_method='Cesarean' AND birth_month='%s'" % patient
-#  print(query)
-#  query_results=pd.read_sql_query(query,con)
+#def locations_output():
+#  #pull 'location' from input field and store it
+#  input_location = request.args.get('location')
+#    #just select the nearest stream sites from the input location from the front page.
+#  query_sites = "SELECT * FROM site_locations WHERE distance='%s'" % input_location
+#  print(query_sites)
+#  query_results=pd.read_sql_query(query_sites,con)
 #  print(query_results)
-#  births = []
+#  near_locations = []
 #  for i in range(0,query_results.shape[0]):
-#      births.append(dict(index=query_results.iloc[i]['index'], attendant=query_results.iloc[i]['attendant'], birth_month=query_results.iloc[i]['birth_month']))
-#      the_result = ModelIt(patient,births)
-#      return render_template("output.html", births = births, the_result = the_result)
+#      near_locations.append(dict(index=query_results.iloc[i]['index'], distance=query_results.iloc[i]['distance']))
+#      return render_template("output.html", near_locations = near_locations)
 
 if __name__ == "__main__":
 #    args = initialize_params()

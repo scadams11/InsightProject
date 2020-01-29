@@ -65,6 +65,7 @@ def index():
 def results():
     if request.method == 'POST':
         input_location = request.form.get('location')
+        input_date = request.form.get('date')
         t = request.form.get('date')
         t = dateparser.parse(t)
         if t < datetime.datetime.now():
@@ -104,16 +105,38 @@ def results():
         loc1_lon = float(query_results[0:1]["dec_long_va"])
         location_1 = pd.DataFrame([loc1_lat, loc1_lon])
 
-        bbox_1 = loc1_lon - 0.036
-        bbox_2 = loc1_lat - 0.036
-        bbox_3 = loc1_lon + 0.036
-        bbox_4 = loc1_lat + 0.036
-        map_url = f"https://www.openstreetmap.org/export/embed.html?bbox={bbox_1}%2C{bbox_2}%2C{bbox_3}%2C{bbox_4}&amp;layer=mapnik&amp;marker={loc1_lat}%2C{loc1_lon}"
+        bbox_1_1 = loc1_lon - 0.010
+        bbox_1_2 = loc1_lat - 0.010
+        bbox_1_3 = loc1_lon + 0.010
+        bbox_1_4 = loc1_lat + 0.010
+        map_url_1 = f"https://www.openstreetmap.org/export/embed.html?bbox={bbox_1_1}%2C{bbox_1_2}%2C{bbox_1_3}%2C{bbox_1_4}&amp;layer=mapnik&amp;marker={loc1_lat}%2C{loc1_lon}"
+
+        loc2_lat = float(query_results[1:2]["dec_lat_va"])
+        loc2_lon = float(query_results[1:2]["dec_long_va"])
+        location_2 = pd.DataFrame([loc1_lat, loc1_lon])
+
+        bbox_2_1 = loc2_lon - 0.010
+        bbox_2_2 = loc2_lat - 0.010
+        bbox_2_3 = loc2_lon + 0.010
+        bbox_2_4 = loc2_lat + 0.010
+        map_url_2 = f"https://www.openstreetmap.org/export/embed.html?bbox={bbox_2_1}%2C{bbox_2_2}%2C{bbox_2_3}%2C{bbox_2_4}&amp;layer=mapnik&amp;marker={loc2_lat}%2C{loc2_lon}"
+
+        loc3_lat = float(query_results[2:3]["dec_lat_va"])
+        loc3_lon = float(query_results[2:3]["dec_long_va"])
+        location_3 = pd.DataFrame([loc3_lat, loc3_lon])
+
+        bbox_3_1 = loc3_lon - 0.010
+        bbox_3_2 = loc3_lat - 0.010
+        bbox_3_3 = loc3_lon + 0.010
+        bbox_3_4 = loc3_lat + 0.010
+        map_url_3 = f"https://www.openstreetmap.org/export/embed.html?bbox={bbox_3_1}%2C{bbox_3_2}%2C{bbox_3_3}%2C{bbox_3_4}&amp;layer=mapnik&amp;marker={loc3_lat}%2C{loc3_lon}"
 
     return render_template('results.html',
                            location=input_location,
-                           time=t,
-                           map_url=map_url)
+                           date=input_date,
+                           map_url_1=map_url_1,
+                           map_url_2=map_url_2,
+                           map_url_3=map_url_3)
 
 ##
 #For pulling stream information based off input location.

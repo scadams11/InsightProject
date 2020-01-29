@@ -75,16 +75,40 @@ def results():
         if location[0] is None:
             return reload_after_error("Whoops, looks like we can't find that location on the map. Please try again.")
 #        area = loc_to_area(location)
-#        if area is None:
-#            return reload_after_error("Whoops, looks like that location isn't in Colorado! Please try again.")
+        if (location[0] > 40.95 or location[0] < 36.97 or location[1] < -109.03 or location[1] > -102.00) :
+            return reload_after_error("Whoops, looks like that location isn't in Colorado! Please try again.")
 
         lat = location[0]
         lon = location[1]
-        bbox_1 = lon - 0.036
-        bbox_2 = lat - 0.036
-        bbox_3 = lon + 0.036
-        bbox_4 = lat + 0.036
-        map_url = f"https://www.openstreetmap.org/export/embed.html?bbox={bbox_1}%2C{bbox_2}%2C{bbox_3}%2C{bbox_4}&amp;layer=mapnik&amp;marker={lat}%2C{lon}"
+
+        sql_query = """
+                    SELECT * FROM site_locations;
+                    """
+        query_results = pd.read_sql_query(sql_query,con)
+
+        site_no = query_results["site_no"]
+        site_lat = query_results["dec_lat_va"]
+        site_long = query_results["dec_long_va"]
+
+        sites_coord = pd.DataFrame([site_no, site_lat, site_long])
+        sites_coord = sites_coord.T
+
+        distance = []
+        for i in range(len(sites_coord)) :
+            distance.append(geopy.distance.distance(location, sites_coord.iloc[i,1:]).miles)
+
+        query_results["distance"] = distance
+        query_results = query_results.sort_values(by = ["distance"])
+
+        loc1_lat = float(query_results[0:1]["dec_lat_va"])
+        loc1_lon = float(query_results[0:1]["dec_long_va"])
+        location_1 = pd.DataFrame([loc1_lat, loc1_lon])
+
+        bbox_1 = loc1_lon - 0.036
+        bbox_2 = loc1_lat - 0.036
+        bbox_3 = loc1_lon + 0.036
+        bbox_4 = loc1_lat + 0.036
+        map_url = f"https://www.openstreetmap.org/export/embed.html?bbox={bbox_1}%2C{bbox_2}%2C{bbox_3}%2C{bbox_4}&amp;layer=mapnik&amp;marker={loc1_lat}%2C{loc1_lon}"
 
     return render_template('results.html',
                            location=input_location,

@@ -74,10 +74,9 @@ def results():
             return reload_after_error("Whoops, looks like you chose a time that's too far in the future.")
         location = geocode_location(input_location)
         if location[0] is None:
-            return reload_after_error("Whoops, looks like we can't find that location on the map. Please try again.")
-#        area = loc_to_area(location)
+            return reload_after_error("We can't find that location on the map. Please try again.")
         if (location[0] > 40.95 or location[0] < 36.97 or location[1] < -109.03 or location[1] > -102.00) :
-            return reload_after_error("Whoops, looks like that location isn't in Colorado! Please try again.")
+            return reload_after_error("That location isn't in Colorado! Please try again.")
 
         lat = location[0]
         lon = location[1]
@@ -101,19 +100,21 @@ def results():
         query_results["distance"] = distance
         query_results = query_results.sort_values(by = ["distance"])
 
-        loc1_lat = float(query_results[0:1]["dec_lat_va"])
-        loc1_lon = float(query_results[0:1]["dec_long_va"])
+        loc1_lat = float(query_results[0:1]["dec_lat_va"].iloc[0])
+        loc1_lon = float(query_results[0:1]["dec_long_va"].iloc[0])
         location_1 = pd.DataFrame([loc1_lat, loc1_lon])
+        loc1_name = query_results[0:1]["station_nm"].iloc[0]
 
         bbox_1_1 = loc1_lon - 0.010
         bbox_1_2 = loc1_lat - 0.010
         bbox_1_3 = loc1_lon + 0.010
         bbox_1_4 = loc1_lat + 0.010
-        map_url_1 = f"https://www.openstreetmap.org/export/embed.html?bbox={bbox_1_1}%2C{bbox_1_2}%2C{bbox_1_3}%2C{bbox_1_4}&amp;layer=mapnik&amp;marker={loc1_lat}%2C{loc1_lon}"
+        map_url_1 = f"https://www.openstreetmap.org/export/embed.html?bbox={bbox_1_1}%2C{bbox_1_2}%2C{bbox_1_3}%2C{bbox_1_4}&amp;layer=mapquest&amp;marker={loc1_lat}%2C{loc1_lon}"
 
-        loc2_lat = float(query_results[1:2]["dec_lat_va"])
-        loc2_lon = float(query_results[1:2]["dec_long_va"])
+        loc2_lat = float(query_results[1:2]["dec_lat_va"].iloc[0])
+        loc2_lon = float(query_results[1:2]["dec_long_va"].iloc[0])
         location_2 = pd.DataFrame([loc1_lat, loc1_lon])
+        loc2_name = query_results[1:2]["station_nm"].iloc[0]
 
         bbox_2_1 = loc2_lon - 0.010
         bbox_2_2 = loc2_lat - 0.010
@@ -121,9 +122,10 @@ def results():
         bbox_2_4 = loc2_lat + 0.010
         map_url_2 = f"https://www.openstreetmap.org/export/embed.html?bbox={bbox_2_1}%2C{bbox_2_2}%2C{bbox_2_3}%2C{bbox_2_4}&amp;layer=mapnik&amp;marker={loc2_lat}%2C{loc2_lon}"
 
-        loc3_lat = float(query_results[2:3]["dec_lat_va"])
-        loc3_lon = float(query_results[2:3]["dec_long_va"])
+        loc3_lat = float(query_results[2:3]["dec_lat_va"].iloc[0])
+        loc3_lon = float(query_results[2:3]["dec_long_va"].iloc[0])
         location_3 = pd.DataFrame([loc3_lat, loc3_lon])
+        loc3_name = query_results[2:3]["station_nm"].iloc[0]
 
         bbox_3_1 = loc3_lon - 0.010
         bbox_3_2 = loc3_lat - 0.010
@@ -136,7 +138,10 @@ def results():
                            date=input_date,
                            map_url_1=map_url_1,
                            map_url_2=map_url_2,
-                           map_url_3=map_url_3)
+                           map_url_3=map_url_3, 
+                           loc1_name=loc1_name,
+                           loc2_name=loc2_name,
+                           loc3_name=loc3_name)
 
 ##
 #For pulling stream information based off input location.

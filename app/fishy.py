@@ -98,12 +98,44 @@ def results():
             distance.append(geopy.distance.distance(location, sites_coord.iloc[i,1:]).miles)
 
         query_results["distance"] = distance
+        site_no = pd.DataFrame(site_no)
+        site_no["distance"] = distance
         query_results = query_results.sort_values(by = ["distance"])
+        site_no = site_no.sort_values(by = ["distance"])
 
-        loc1_lat = float(query_results[0:1]["dec_lat_va"].iloc[0])
-        loc1_lon = float(query_results[0:1]["dec_long_va"].iloc[0])
+        count = 0
+        loc_lat = list()
+        loc_lon = list()
+        flow = list()
+        flow_upper = list()
+        flow_lower = list()
+        good_site = list()
+        good_dist = list()
+
+        for i in range(len(site_no)) :
+            sql_query_model = """
+                              SELECT * FROM n"""+site_no['site_no'].iloc[i]+"""_forecast;
+                              """
+            query_results_model = pd.read_sql_query(sql_query_model,con)
+            temp = query_results_model.loc[query_results_model['ds'] == t]
+            if (temp['yhat'].iloc[0] > 100 and temp['yhat'].iloc[0] < 400) :
+                loc_lat.append(float(query_results[i:i+1]["dec_lat_va"]))
+                loc_lon.append(float(query_results[i:i+1]["dec_long_va"]))
+                good_site.append(query_results[i:i+1]["site_no"].iloc[0])
+                good_dist.append(query_results[i:i+1]["distance"].iloc[0])
+                flow.append(temp['yhat'].iloc[0])
+                flow_upper.append(temp['yhat_upper'].iloc[0])
+                flow_lower.append(temp['yhat_lower'].iloc[0])
+                count = count + 1
+                if count == 3 :
+                    break
+
+
+
+        loc1_lat = loc_lat[0] #float(query_results[0:1]["dec_lat_va"].iloc[0])
+        loc1_lon = loc_lon[0] #float(query_results[0:1]["dec_long_va"].iloc[0])
         location_1 = pd.DataFrame([loc1_lat, loc1_lon])
-        loc1_name = query_results[0:1]["station_nm"].iloc[0]
+        loc1_name = good_site[0] #query_results[0:1]["station_nm"].iloc[0]
 
         bbox_1_1 = loc1_lon - 0.010
         bbox_1_2 = loc1_lat - 0.010
@@ -111,10 +143,10 @@ def results():
         bbox_1_4 = loc1_lat + 0.010
         map_url_1 = f"https://www.openstreetmap.org/export/embed.html?bbox={bbox_1_1}%2C{bbox_1_2}%2C{bbox_1_3}%2C{bbox_1_4}&amp;layer=mapquest&amp;marker={loc1_lat}%2C{loc1_lon}"
 
-        loc2_lat = float(query_results[1:2]["dec_lat_va"].iloc[0])
-        loc2_lon = float(query_results[1:2]["dec_long_va"].iloc[0])
+        loc2_lat = loc_lat[1] #float(query_results[1:2]["dec_lat_va"].iloc[0])
+        loc2_lon = loc_lon[1] #float(query_results[1:2]["dec_long_va"].iloc[0])
         location_2 = pd.DataFrame([loc1_lat, loc1_lon])
-        loc2_name = query_results[1:2]["station_nm"].iloc[0]
+        loc2_name = good_site[1] #query_results[1:2]["station_nm"].iloc[0]
 
         bbox_2_1 = loc2_lon - 0.010
         bbox_2_2 = loc2_lat - 0.010
@@ -122,10 +154,10 @@ def results():
         bbox_2_4 = loc2_lat + 0.010
         map_url_2 = f"https://www.openstreetmap.org/export/embed.html?bbox={bbox_2_1}%2C{bbox_2_2}%2C{bbox_2_3}%2C{bbox_2_4}&amp;layer=mapnik&amp;marker={loc2_lat}%2C{loc2_lon}"
 
-        loc3_lat = float(query_results[2:3]["dec_lat_va"].iloc[0])
-        loc3_lon = float(query_results[2:3]["dec_long_va"].iloc[0])
+        loc3_lat = loc_lat[2] #float(query_results[2:3]["dec_lat_va"].iloc[0])
+        loc3_lon = loc_lon[2] #float(query_results[2:3]["dec_long_va"].iloc[0])
         location_3 = pd.DataFrame([loc3_lat, loc3_lon])
-        loc3_name = query_results[2:3]["station_nm"].iloc[0]
+        loc3_name = good_site[2] #query_results[2:3]["station_nm"].iloc[0]
 
         bbox_3_1 = loc3_lon - 0.010
         bbox_3_2 = loc3_lat - 0.010

@@ -36,13 +36,16 @@ def calc_nowish():
     return now
 
 def geocode_location(location):
-    query = re.sub(r'\s+', '\+', location+', CO')
+    query = re.sub(r'\s+', '\+', location+',CO')
     request = f'https://nominatim.openstreetmap.org/search?q={query}&format=json'
     res = requests.get(request)
     if res.status_code == 200:
-        lat = float(res.json()[0]['lat'])
-        lon = float(res.json()[0]['lon'])
-        return (lat, lon)
+        try:
+            lat = float(res.json()[0]['lat'])
+            lon = float(res.json()[0]['lon'])
+            return (lat, lon)
+        except IndexError:
+            return (None, None)
     else:
         return (None, None)
 
@@ -110,6 +113,7 @@ def results():
         flow_upper = list()
         flow_lower = list()
         good_site = list()
+        good_site_nm = list()
         good_dist = list()
 
         for i in range(len(site_no)) :
@@ -117,25 +121,29 @@ def results():
                               SELECT * FROM n"""+site_no['site_no'].iloc[i]+"""_forecast;
                               """
             query_results_model = pd.read_sql_query(sql_query_model,con)
-            temp = query_results_model.loc[query_results_model['ds'] == t]
-            if (temp['yhat'].iloc[0] > 100 and temp['yhat'].iloc[0] < 400) :
-                loc_lat.append(float(query_results[i:i+1]["dec_lat_va"]))
-                loc_lon.append(float(query_results[i:i+1]["dec_long_va"]))
-                good_site.append(query_results[i:i+1]["site_no"].iloc[0])
-                good_dist.append(query_results[i:i+1]["distance"].iloc[0])
-                flow.append(temp['yhat'].iloc[0])
-                flow_upper.append(temp['yhat_upper'].iloc[0])
-                flow_lower.append(temp['yhat_lower'].iloc[0])
-                count = count + 1
-                if count == 3 :
-                    break
-
+            if (t == query_results_model['ds']).any() :
+                temp = query_results_model.loc[query_results_model['ds'] == t]
+                if (temp['yhat'].iloc[0] > 100 and temp['yhat'].iloc[0] < 400) :
+                    loc_lat.append(float(query_results[i:i+1]["dec_lat_va"]))
+                    loc_lon.append(float(query_results[i:i+1]["dec_long_va"]))
+                    good_site.append(query_results[i:i+1]["site_no"].iloc[0])
+                    good_site_nm.append(query_results[i:i+1]["station_nm"].iloc[0])
+                    good_dist.append(query_results[i:i+1]["distance"].iloc[0])
+                    flow.append(temp['yhat'].iloc[0])
+                    flow_upper.append(temp['yhat_upper'].iloc[0])
+                    flow_lower.append(temp['yhat_lower'].iloc[0])
+                    count = count + 1
+                    if count == 3 :
+                        break
+            else :
+                continue
 
 
         loc1_lat = loc_lat[0] #float(query_results[0:1]["dec_lat_va"].iloc[0])
         loc1_lon = loc_lon[0] #float(query_results[0:1]["dec_long_va"].iloc[0])
         location_1 = pd.DataFrame([loc1_lat, loc1_lon])
-        loc1_name = good_site[0] #query_results[0:1]["station_nm"].iloc[0]
+        loc1_name = good_site_nm[0] #query_results[0:1]["station_nm"].iloc[0]
+        loc1_dist = round(good_dist[0])
 
         bbox_1_1 = loc1_lon - 0.010
         bbox_1_2 = loc1_lat - 0.010
@@ -146,7 +154,8 @@ def results():
         loc2_lat = loc_lat[1] #float(query_results[1:2]["dec_lat_va"].iloc[0])
         loc2_lon = loc_lon[1] #float(query_results[1:2]["dec_long_va"].iloc[0])
         location_2 = pd.DataFrame([loc1_lat, loc1_lon])
-        loc2_name = good_site[1] #query_results[1:2]["station_nm"].iloc[0]
+        loc2_name = good_site_nm[1] #query_results[1:2]["station_nm"].iloc[0]
+        loc2_dist = round(good_dist[1])
 
         bbox_2_1 = loc2_lon - 0.010
         bbox_2_2 = loc2_lat - 0.010
@@ -157,7 +166,8 @@ def results():
         loc3_lat = loc_lat[2] #float(query_results[2:3]["dec_lat_va"].iloc[0])
         loc3_lon = loc_lon[2] #float(query_results[2:3]["dec_long_va"].iloc[0])
         location_3 = pd.DataFrame([loc3_lat, loc3_lon])
-        loc3_name = good_site[2] #query_results[2:3]["station_nm"].iloc[0]
+        loc3_name = good_site_nm[2] #query_results[2:3]["station_nm"].iloc[0]
+        loc3_dist = round(good_dist[2])
 
         bbox_3_1 = loc3_lon - 0.010
         bbox_3_2 = loc3_lat - 0.010
@@ -173,7 +183,10 @@ def results():
                            map_url_3=map_url_3, 
                            loc1_name=loc1_name,
                            loc2_name=loc2_name,
-                           loc3_name=loc3_name)
+                           loc3_name=loc3_name,
+                           loc1_dist=loc1_dist,
+                           loc2_dist=loc2_dist,
+                           loc3_dist=loc3_dist)
 
 ##
 #For pulling stream information based off input location.

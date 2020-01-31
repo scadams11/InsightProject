@@ -144,6 +144,8 @@ def results():
         location_1 = pd.DataFrame([loc1_lat, loc1_lon])
         loc1_name = good_site_nm[0] #query_results[0:1]["station_nm"].iloc[0]
         loc1_dist = round(good_dist[0])
+        loc1_flow = round(flow[0])
+        loc1_flow_up = round(flow_upper[0])
 
         bbox_1_1 = loc1_lon - 0.010
         bbox_1_2 = loc1_lat - 0.010
@@ -156,6 +158,8 @@ def results():
         location_2 = pd.DataFrame([loc1_lat, loc1_lon])
         loc2_name = good_site_nm[1] #query_results[1:2]["station_nm"].iloc[0]
         loc2_dist = round(good_dist[1])
+        loc2_flow = round(flow[1])
+        loc2_flow_up = round(flow_upper[1])
 
         bbox_2_1 = loc2_lon - 0.010
         bbox_2_2 = loc2_lat - 0.010
@@ -168,6 +172,8 @@ def results():
         location_3 = pd.DataFrame([loc3_lat, loc3_lon])
         loc3_name = good_site_nm[2] #query_results[2:3]["station_nm"].iloc[0]
         loc3_dist = round(good_dist[2])
+        loc3_flow = round(flow[2])
+        loc3_flow_up = round(flow_upper[2])
 
         bbox_3_1 = loc3_lon - 0.010
         bbox_3_2 = loc3_lat - 0.010
@@ -186,7 +192,13 @@ def results():
                            loc3_name=loc3_name,
                            loc1_dist=loc1_dist,
                            loc2_dist=loc2_dist,
-                           loc3_dist=loc3_dist)
+                           loc3_dist=loc3_dist,
+                           loc1_flow=loc1_flow, 
+                           loc2_flow=loc2_flow, 
+                           loc3_flow=loc3_flow, 
+                           loc1_flow_up=loc1_flow_up, 
+                           loc2_flow_up=loc2_flow_up,
+                           loc3_flow_up=loc3_flow_up)
 
 ##
 #For pulling stream information based off input location.

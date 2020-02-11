@@ -20,7 +20,7 @@ app = Flask(__name__)
 ##
 user = 'cadeadams' #add your username here (same as previous postgreSQL)                      
 host = 'localhost'
-dbname = 'usgs_stream_db'
+dbname = 'usgs_stream_db_log'
 db = create_engine('postgres://%s%s/%s'%(user,host,dbname))
 con = None
 con = psycopg2.connect(database = dbname, user = user)
@@ -123,15 +123,15 @@ def results():
             query_results_model = pd.read_sql_query(sql_query_model,con)
             if (t == query_results_model['ds']).any() :
                 temp = query_results_model.loc[query_results_model['ds'] == t]
-                if (temp['yhat'].iloc[0] > 100 and temp['yhat'].iloc[0] < 400) :
+                if (temp['yhat_rescaled'].iloc[0] > 100 and temp['yhat_rescaled'].iloc[0] < 400) :
                     loc_lat.append(float(query_results[i:i+1]["dec_lat_va"]))
                     loc_lon.append(float(query_results[i:i+1]["dec_long_va"]))
                     good_site.append(query_results[i:i+1]["site_no"].iloc[0])
                     good_site_nm.append(query_results[i:i+1]["station_nm"].iloc[0])
                     good_dist.append(query_results[i:i+1]["distance"].iloc[0])
-                    flow.append(temp['yhat'].iloc[0])
-                    flow_upper.append(temp['yhat_upper'].iloc[0])
-                    flow_lower.append(temp['yhat_lower'].iloc[0])
+                    flow.append(temp['yhat_rescaled'].iloc[0])
+                    flow_upper.append(temp['yhat_upper_rescaled'].iloc[0])
+                    flow_lower.append(temp['yhat_lower_rescaled'].iloc[0])
                     count = count + 1
                     if count == 3 :
                         break

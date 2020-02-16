@@ -38,11 +38,13 @@ def calc_nowish():
 def geocode_location(location):
     query = re.sub(r'\s+', '\+', location+',CO')
     request = f'https://nominatim.openstreetmap.org/search?q={query}&format=json'
-    res = requests.get(request)
+    headers = {'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.100 Safari/537.36'}
+    res = requests.get(request, headers=headers)
+    print(res.status_code)
     if res.status_code == 200:
         try:
-            lat = float(res.json()[0]['lat'])
-            lon = float(res.json()[0]['lon'])
+            lat = float(res.json()[0]["lat"])
+            lon = float(res.json()[0]["lon"])
             return (lat, lon)
         except IndexError:
             return (None, None)

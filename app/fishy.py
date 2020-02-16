@@ -202,38 +202,6 @@ def results():
                            loc2_flow_up=loc2_flow_up,
                            loc3_flow_up=loc3_flow_up)
 
-##
-#For pulling stream information based off input location.
-##
-#@app.route('/db')
-#def stream_page():
-#    sql_query = """                                                                       
-#                SELECT * FROM n"""+site_no[i]""";
-#                """
-#    query_results = pd.read_sql_query(sql_query,con)
-#    streams = ""
-#    for i in range(0,10):
-#        streams += query_results.iloc[i]['birth_month']
-#        streams += "<br>"
-#    return streams
-
-#@app.route('/input')
-#def cesareans_input():
-#    return render_template("input.html")
-
-#@app.route('/output')
-#def locations_output():
-#  #pull 'location' from input field and store it
-#  input_location = request.args.get('location')
-#    #just select the nearest stream sites from the input location from the front page.
-#  query_sites = "SELECT * FROM site_locations WHERE distance='%s'" % input_location
-#  print(query_sites)
-#  query_results=pd.read_sql_query(query_sites,con)
-#  print(query_results)
-#  near_locations = []
-#  for i in range(0,query_results.shape[0]):
-#      near_locations.append(dict(index=query_results.iloc[i]['index'], distance=query_results.iloc[i]['distance']))
-#      return render_template("output.html", near_locations = near_locations)
 
 if __name__ == "__main__":
 #    args = initialize_params()

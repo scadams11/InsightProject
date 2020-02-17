@@ -55,10 +55,10 @@ for site in site_no_cv :
 
 cross_val_all["mae_baseline"] = mae_baseline
 cross_val_all["mae_model"] = mae_model
-cross_val_all["mae_improvement"] = mae_baseline / mae_model
+cross_val_all["mae_improvement"] = cross_val_all["mae_baseline"] / cross_val_all["mae_model"]
 cross_val_all["mape_baseline"] = mape_baseline
 cross_val_all["mape_model"] = mape_model
-cross_val_all["mape_improvement"] = mape_baseline / mape_model
+cross_val_all["mape_improvement"] = cross_val_all["mape_baseline"] / cross_val_all["mape_model"]
 cross_val_all["elevation"] = site_ele_cv
 
 cross_val_all.to_sql("cross_val_all", engine, if_exists='replace')

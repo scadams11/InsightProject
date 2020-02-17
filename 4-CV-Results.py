@@ -10,6 +10,10 @@ def mean_absolute_percentage_error(y_true, y_pred):
 username = 'cadeadams'
 dbname = 'usgs_stream_db_log'
 
+engine = create_engine('postgres://%s@localhost/%s'%(username,dbname))
+if not database_exists(engine.url):
+    create_database(engine.url)
+
 con = None
 con = psycopg2.connect(database = dbname, user = username)
 
@@ -33,6 +37,8 @@ site_ele_cv = list(sites_cv["alt_va"])
 
 cross_val_all["site_no"] = site_no_cv
 
+mae_baseline = []
+mae_model = []
 mape_baseline = list()
 mape_model = list()
 for site in site_no_cv :
@@ -41,10 +47,18 @@ for site in site_no_cv :
                 """
     site_cv_from_sql = pd.read_sql_query(sql_query,con)
     site_cv_from_sql['mean'] = pd.Series([0 for x in range(len(site_cv_from_sql.index))], index=site_cv_from_sql.index)
-    site_cv_from_sql['mean'] = np.mean(site_cv_from_sql.y)
-    mape_baseline.append(mean_absolute_percentage_error(site_cv_from_sql.y, site_cv_from_sql.mean))
-    mape_model.append(mean_absolute_percentage_error(site_cv_from_sql.y, site_cv_from_sql.yhat))
+    site_cv_from_sql['mean'] = np.mean(site_cv_from_sql['y_rescaled'])
+    mae_baseline.append(mean_absolute_error(site_cv_from_sql['y_rescaled'], site_cv_from_sql['mean']))
+    mae_model.append(mean_absolute_error(site_cv_from_sql['y_rescaled'], site_cv_from_sql['yhat_rescaled']))
+    mape_baseline.append(mean_absolute_percentage_error(site_cv_from_sql['y_rescaled'], site_cv_from_sql['mean']))
+    mape_model.append(mean_absolute_percentage_error(site_cv_from_sql['y_rescaled'], site_cv_from_sql['yhat_rescaled']))
 
+cross_val_all["mae_baseline"] = mae_baseline
+cross_val_all["mae_model"] = mae_model
+cross_val_all["mae_improvement"] = mae_baseline / mae_model
 cross_val_all["mape_baseline"] = mape_baseline
 cross_val_all["mape_model"] = mape_model
+cross_val_all["mape_improvement"] = mape_baseline / mape_model
 cross_val_all["elevation"] = site_ele_cv
+
+cross_val_all.to_sql("cross_val_all", engine, if_exists='replace')
